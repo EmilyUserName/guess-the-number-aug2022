@@ -1,60 +1,45 @@
-const { networkInterfaces } = require("os");
 const readline = require("readline");
 const rl = readline.createInterface(process.stdin, process.stdout);
 
 function ask(questionText) {
-  return new Promise((resolve, reject) => {
-    rl.question(questionText, resolve);
-  });
+  return new Promise((resolve) => rl.question(questionText, resolve));
+}
+
+async function start() {
+  console.log("Let's play a game where you (human) make up a number and I (computer) try to guess it.");
+  let max = 100;
+  let min = 1;
+  let guess;
+  let tries = 0;
+
+  await ask("Think of a number between 1 and 100 and press Enter when ready...\n");
+
+  while (true) {
+    guess = Math.floor((min + max) / 2);
+    tries++;
+    let response = await ask(`Is your number ${guess}? (Y/N): `);
+
+    if (response.toLowerCase() === "y" || response.toLowerCase() === "yes") {
+      console.log(`Yay! I guessed your number ${guess} in ${tries} tries!`);
+      break;
+    }
+
+    let highLow = await ask("Is it higher (H) or lower (L)? ");
+    if (highLow.toLowerCase() === "h") {
+      min = guess + 1;
+    } else if (highLow.toLowerCase() === "l") {
+      max = guess - 1;
+    } else {
+      console.log("Please enter 'H' for higher or 'L' for lower.");
+    }
+
+    if (min > max) {
+      console.log("Hmm, something doesn't add up. Are you cheating? 😜");
+      break;
+    }
+  }
+
+  rl.close();
 }
 
 start();
-
-//start by asking participant to play a game
-async function start() {
-  console.log(
-    "Let's play a game where you (human) make up a number and I (computer) try to guess it."
-  );
-  //ask for the secret number
-  let secretNumber = await ask(
-    "What is your secret number?\nI won't peek, I promise...\n"
-  );
-  //particiapant enters number
-  console.log("You entered: " + secretNumber + "\nLet's play!");
-  //computer guesses random generated response:
-  let firstGuess = Math.floor(Math.random() * 101);
-  console.log("Is your number " + firstGuess + "?");
-  //computer waits for response and askes y/n
-  let yesNo = await ask("Yes or No?\n");
-  ß;
-  //capture yes or no response
-
-  //!no is not working? (YES IS WORKING?)
-  function resp1() {
-    const answer = "y";
-    if (answer === "y") {
-      console.log("Great!\nI guessed your number!");
-      //work on no response ITS NOT WORKING YET
-    } else {
-      console.log(
-        "OK, no biggie, is your number higher or lower than " +
-          firstGuess +
-          " ?"
-      );
-    }
-  }
-  resp1();
-
-  //leave this at the very bottom:
-  process.exit();
-}
-
-/* Your number is between //display the two outer number range of the remaining options
-
-Is it… //display half of the displayed number from the options from above
-
-Yay! Your number is ! Good Game!
-I guessed in “” tries!
-
-Would you like to play again? (Y)es or (N)o?
-*/
